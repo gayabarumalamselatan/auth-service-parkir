@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model role {
+  id         Int          @id @default(autoincrement())
+  role_name  String
+  permission permission[]
+  user       user[]
+}
+
+model user {
+  id          Int     @id @default(autoincrement())
+  name        String? @unique(map: "User_name_key")
+  password    String
+  is_loggedIn Boolean @default(false)
+  role_id     Int
+  role        role    @relation(fields: [role_id], references: [id], map: "User_role_id_fkey")
+
+  @@index([role_id], map: "User_role_id_fkey")
+}
+
+model permission {
+  id        Int     @id @default(autoincrement())
+  role_id   Int
+  module_id Int?
+  menu_id   Int?
+  menu      menu?   @relation(fields: [menu_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "permission_menu_FK")
+  module    module? @relation(fields: [module_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "permission_module_FK")
+  role      role    @relation(fields: [role_id], references: [id], onUpdate: Restrict, map: "permission_role_FK")
+
+  @@index([role_id], map: "permission_role_FK")
+  @@index([menu_id], map: "permission_menu_FK")
+  @@index([module_id], map: "permission_module_FK")
+}
+
+model menu {
+  id         Int          @id @default(autoincrement())
+  module_id  Int?
+  menu_name  String?      @db.VarChar(100)
+  url        String?      @db.VarChar(100)
+  element    String?      @db.VarChar(100)
+  module     module?      @relation(fields: [module_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "menu_module_FK")
+  permission permission[]
+
+  @@index([module_id], map: "menu_module_FK")
+}
+
+model module {
+  id          Int          @id @default(autoincrement())
+  module_name String?      @db.VarChar(100)
+  url         String?      @db.VarChar(100)
+  element     String?      @db.VarChar(100)
+  menu        menu[]
+  permission  permission[]
+}
