@@ -28,7 +28,13 @@ const loginAuth = async (req, res) => {
       return res.status(401).json({ message: result.message });
     }
     console.log(result)
-    return res.status(200).json({ message: result.message, userId: result.id, userName: result.name });
+    return res.status(200).json({ 
+      message: result.message, 
+      userId: result.id, 
+      userName: result.name, 
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken
+    });
   } catch (error) {
     console.error('Database error:', error);
     return res.status(500).json({ message: 'Internal server error' });

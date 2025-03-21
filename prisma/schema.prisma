@@ -59,3 +59,16 @@ model module {
   menu        menu[]
   permission  permission[]
 }
+
+model member {
+  id                 Int      @id @default(autoincrement())
+  nomor_polisi       String
+  nomor_pengganti    String
+  nama_pemilik       String
+  nomor_hp           String
+  tanggal_masuk      DateTime @db.Date
+  bulanan            Int
+  keterangan         String
+  is_black_list      Boolean  @default(false)
+  tanggal_kadaluarsa DateTime @db.Date
+}

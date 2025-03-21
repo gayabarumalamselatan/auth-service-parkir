@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs')
 const { PrismaClient } = require('@prisma/client');
+const jwt = require("jsonwebtoken")
 
 const prisma = new PrismaClient();
 
@@ -57,12 +58,31 @@ const loginAuth = async (name, password) => {
       where: {id: user.id},
       data: {is_loggedIn: true}
     })
+
+    const secretKey = process.env.SECRET_KEY
+    const refreshKey = process.env.REFRESH_KEY
+
+    const accessToken = jwt.sign({
+      id: user.id
+    }, secretKey,{
+      expiresIn: '5m'
+    })
+
+    const refreshToken = jwt.sign({
+      id: user.id
+    }, refreshKey, {
+      expiresIn: '1h'
+    })
+
     return { 
       success: true, 
       message: 'Login successful', 
       id: user.id,
-      name: user.name
+      name: user.name,
+      accessToken: accessToken,
+      refreshToken: refreshToken
     };
+
   } else {
     return { success: false, message: 'Incorrect password' };
   }
